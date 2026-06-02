@@ -89,9 +89,11 @@ if [[ "${MASSCAN_EXTRA} ${MASSCAN_CMD}" != *"--router-mac"* ]]; then
 fi
 
 log "Stage 1: masscan shard ${SHARD_INDEX}/${SHARD_TOTAL} @ ${MASSCAN_RATE}pps on ${PORTS}"
+# masscan numbers shards 1-based (1/N..N/N); our SHARD_INDEX is 0-based (0..N-1).
+MASSCAN_SHARD=$(( SHARD_INDEX + 1 ))
 ${MASSCAN_CMD} ${TARGETS} \
     -p"${PORTS}" \
-    --shards "${SHARD_INDEX}"/"${SHARD_TOTAL}" \
+    --shards "${MASSCAN_SHARD}"/"${SHARD_TOTAL}" \
     --rate "${MASSCAN_RATE}" \
     --source-port "${MASSCAN_SRC_PORTS%-*}" \
     --excludefile "${BLOCKLIST}" \
