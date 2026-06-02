@@ -173,7 +173,7 @@ fi
 export PATH="$PATH:/usr/local/go/bin"
 log "Building zgrab2 / zdns / jarm into /usr/local/bin…"
 GOBIN=/usr/local/bin GOFLAGS=-mod=mod go install github.com/zmap/zgrab2/cmd/zgrab2@latest
-GOBIN=/usr/local/bin go install github.com/zmap/zdns/cmd/zdns@latest
+GOBIN=/usr/local/bin go install github.com/zmap/zdns/v2@latest
 GOBIN=/usr/local/bin go install github.com/RumbleDiscovery/jarm-go/cmd/jarm@latest 2>/dev/null \
   || warn "jarm-go build failed; JARM stage will be skipped unless installed manually"
 ok "Scanner toolchain installed: $(command -v masscan), zgrab2, zdns"
