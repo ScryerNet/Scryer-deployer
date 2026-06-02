@@ -33,7 +33,7 @@ fi
 # --- zdns (fast DNS) ---
 if [ ! -x "$HOME/go/bin/zdns" ]; then
     echo "[*] Building zdns..."
-    go install github.com/zmap/zdns/cmd/zdns@latest
+    go install github.com/zmap/zdns/v2@latest
 fi
 
 # --- JARM (active TLS server fingerprint) ---

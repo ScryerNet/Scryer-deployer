@@ -9,7 +9,7 @@
 #     bash -c "$(curl -fsSL https://raw.githubusercontent.com/<you>/<deployer-repo>/main/bootstrap.sh)"
 set -euo pipefail
 
-DEPLOYER_REPO="${DEPLOYER_REPO:-https://github.com/CHANGE_ME/deployer-repo.git}"
+DEPLOYER_REPO="${DEPLOYER_REPO:-https://github.com/ScryerNet/Scryer-deployer.git}"
 DEST="${DEST:-$HOME/scanner-repo}"
 
 echo "[*] Installing git..."

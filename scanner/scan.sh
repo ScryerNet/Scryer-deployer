@@ -44,6 +44,50 @@ mkdir -p "${DEST}/raw/${STAMP}"
 # ---------------------------------------------------------------------------
 # STAGE 1: masscan port discovery for this shard (--shards i/n = disjoint 1/n).
 # ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# Auto-detect the public egress interface + next-hop MAC for masscan's raw
+# stack. masscan needs an L2 next-hop MAC; on multi-NIC cloud VMs the default
+# route often points at an internal NIC whose gateway won't ARP, so we PREFER
+# the interface that holds a public (non-RFC1918) IP. Skipped if the operator
+# already pinned --router-mac in MASSCAN_EXTRA or MASSCAN_CMD.
+# ---------------------------------------------------------------------------
+if [[ "${MASSCAN_EXTRA} ${MASSCAN_CMD}" != *"--router-mac"* ]]; then
+    log "Auto-detecting scan interface and gateway MAC…"
+    det_iface=""; det_src=""; det_gw=""; det_mac=""
+    # 1. Prefer an interface bearing a public IPv4 address.
+    for dev in $(ip -o link show 2>/dev/null | awk -F': ' '{print $2}' | cut -d@ -f1 | grep -v '^lo$'); do
+        while read -r ip4; do
+            case "$ip4" in
+                10.*|192.168.*|172.1[6-9].*|172.2[0-9].*|172.3[0-1].*|169.254.*|127.*|"") ;;
+                *) det_iface="$dev"; det_src="$ip4"; break ;;
+            esac
+        done < <(ip -4 -o addr show dev "$dev" 2>/dev/null | awk '{print $4}' | cut -d/ -f1)
+        [ -n "$det_iface" ] && break
+    done
+    # 2. Fallback: kernel's actual egress path to a public IP.
+    if [ -z "$det_iface" ]; then
+        read -r det_gw det_iface det_src < <(ip route get 1.1.1.1 2>/dev/null | \
+            awk '{for(i=1;i<=NF;i++){if($i=="via")g=$(i+1);if($i=="dev")d=$(i+1);if($i=="src")s=$(i+1)}print g,d,s}')
+    fi
+    # 3. Gateway for the chosen interface.
+    [ -z "$det_gw" ] && det_gw="$(ip route show default dev "$det_iface" 2>/dev/null | awk '/via/{print $3; exit}')"
+    [ -z "$det_gw" ] && det_gw="$(ip route get 1.1.1.1 2>/dev/null | sed -n 's/.* via \([^ ]*\).*/\1/p')"
+    # 4. Actively resolve the gateway MAC (force egress, then neighbor lookup).
+    for _ in 1 2 3 4 5; do
+        curl -s -o /dev/null --max-time 3 https://github.com 2>/dev/null || true
+        det_mac="$(ip neigh get "$det_gw" dev "$det_iface" 2>/dev/null | grep -oiE '([0-9a-f]{2}:){5}[0-9a-f]{2}' | head -1)"
+        [ -n "$det_mac" ] && break
+        sleep 1
+    done
+    if [ -n "$det_iface" ] && [ -n "$det_mac" ]; then
+        MASSCAN_EXTRA="--interface ${det_iface} --router-mac ${det_mac}${det_src:+ --source-ip ${det_src}} ${MASSCAN_EXTRA}"
+        log "  detected interface=${det_iface} gw=${det_gw} mac=${det_mac} src=${det_src}"
+    else
+        log "  WARN: auto-detect incomplete (iface=${det_iface:-?} gw=${det_gw:-?} mac=${det_mac:-?})."
+        log "        Set MASSCAN_EXTRA in scanner/config.env manually if masscan can't send."
+    fi
+fi
+
 log "Stage 1: masscan shard ${SHARD_INDEX}/${SHARD_TOTAL} @ ${MASSCAN_RATE}pps on ${PORTS}"
 ${MASSCAN_CMD} ${TARGETS} \
     -p"${PORTS}" \
@@ -51,6 +95,7 @@ ${MASSCAN_CMD} ${TARGETS} \
     --rate "${MASSCAN_RATE}" \
     --source-port "${MASSCAN_SRC_PORTS%-*}" \
     --excludefile "${BLOCKLIST}" \
+    ${MASSCAN_EXTRA} \
     --open-only \
     -oL "${RAW}/masscan.list"
 awk '/^open/ {print $4","$3}' "${RAW}/masscan.list" | sort -u > "${RAW}/ip_port.csv"

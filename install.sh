@@ -92,7 +92,7 @@ NS_SHARD_INDEX="${NS_SHARD_INDEX:-}"
 NS_SHARD_TOTAL="${NS_SHARD_TOTAL:-3}"
 NS_NODE_NAME="${NS_NODE_NAME:-$(hostname)}"
 NS_ON_CALENDAR="${NS_ON_CALENDAR:-daily}"
-NS_INSTALL_REPO="${NS_INSTALL_REPO:-https://github.com/CHANGE_ME/deployer-repo.git}"
+NS_INSTALL_REPO="${NS_INSTALL_REPO:-https://github.com/ScryerNet/Scryer-deployer.git}"
 NS_INSTALL_TOKEN="${NS_INSTALL_TOKEN:-$NS_GIT_TOKEN}"
 
 prompt() { local v; [[ "${NS_NONINTERACTIVE:-0}" == "1" ]] && die "$1 is required"; read -rp "$2" v; echo "$v"; }
@@ -173,7 +173,7 @@ fi
 export PATH="$PATH:/usr/local/go/bin"
 log "Building zgrab2 / zdns / jarm into /usr/local/bin…"
 GOBIN=/usr/local/bin GOFLAGS=-mod=mod go install github.com/zmap/zgrab2/cmd/zgrab2@latest
-GOBIN=/usr/local/bin go install github.com/zmap/zdns/cmd/zdns@latest
+GOBIN=/usr/local/bin go install github.com/zmap/zdns/v2@latest
 GOBIN=/usr/local/bin go install github.com/RumbleDiscovery/jarm-go/cmd/jarm@latest 2>/dev/null \
   || warn "jarm-go build failed; JARM stage will be skipped unless installed manually"
 ok "Scanner toolchain installed: $(command -v masscan), zgrab2, zdns"
