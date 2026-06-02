@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Internet Measurement Research — Scan Information</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  body{font:16px/1.6 system-ui,sans-serif;max-width:720px;margin:3rem auto;padding:0 1rem;color:#111}
+  code{background:#f3f3f3;padding:.1em .3em;border-radius:4px}
+  .box{border-left:4px solid #555;padding:.5rem 1rem;background:#fafafa}
+</style>
+</head>
+<body>
+<h1>Internet measurement research</h1>
+<p>This host is part of an academic / security research project that performs
+low-rate, non-intrusive network measurements across the public internet. We record
+which ports respond and collect publicly presented banners, TLS certificates, SSH
+host keys, and DNS records. <strong>We do not attempt to log in, exploit, or access
+any private data.</strong></p>
+
+<div class="box">
+<h2>Opt out</h2>
+<p>To have your network excluded from all future scans, email the address below with
+your IP range(s). We process opt-outs the same day.</p>
+<p>Contact: <code>research@example.org</code></p>
+</div>
+
+<h2>What we collect</h2>
+<ul>
+  <li>Open TCP ports (SYN scan)</li>
+  <li>Service banners and HTTP response headers</li>
+  <li>TLS certificates and JARM server fingerprints</li>
+  <li>SSH host-key fingerprints and supported algorithms</li>
+  <li>Reverse DNS (PTR) records</li>
+</ul>
+
+<p>Scanning source addresses: <code>203.0.113.10</code>, <code>203.0.113.11</code>,
+<code>203.0.113.12</code> (replace with yours).</p>
+</body>
+</html>

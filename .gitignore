@@ -1,0 +1,7 @@
+# Deployer repo holds CODE only. Scan scratch + the intel clone live outside git here.
+raw/
+intel-sync/
+deployer/inventory.yaml
+*.pem
+*.key
+__pycache__/
