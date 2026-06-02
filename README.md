@@ -1,4 +1,4 @@
-# deployer-repo — distributed internet scanner (scanner + provisioning)
+# deployer-repo - distributed internet scanner (scanner + provisioning)
 
 This is the **deployer**: the scanner code and provisioning that gets installed on
 your Debian VMs. Results are pushed to a **separate intel-repo** (see its README).
@@ -8,6 +8,19 @@ with zgrab2 / JARM / zdns, and push results to the intel repo. Load is split wit
 masscan's native `--shards i/3` (disjoint, no overlap, no gaps).
 
 ## Install the scanner on a VM (one command)
+
+```
+read -rp "Intel repo URL: " REPO; \
+read -rsp "Token for that repo: " GH; echo; \
+read -rp "Shard index (0/1/2): " IDX; \
+[ -n "$GH" ] && [ -n "$REPO" ] && \
+export NS_REPO="$REPO" NS_GIT_TOKEN="$GH" NS_SHARD_INDEX="$IDX" \
+       NS_SHARD_TOTAL=3 NS_NODE_NAME="$(hostname)" NS_NONINTERACTIVE=1 \
+       NS_INSTALL_REPO="https://github.com/ScryerNet/Scryer-deployer.git" && \
+curl -fsSL https://raw.githubusercontent.com/ScryerNet/Scryer-deployer/main/install.sh \
+  | sudo -E bash; \
+unset GH REPO IDX NS_REPO NS_GIT_TOKEN NS_SHARD_INDEX NS_SHARD_TOTAL NS_NODE_NAME NS_NONINTERACTIVE NS_INSTALL_REPO
+```
 
 Run this on each Debian VM (replace `<you>` / repo names):
 
