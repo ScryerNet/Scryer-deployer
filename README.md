@@ -14,16 +14,12 @@ read -rp "Intel repo URL: " REPO; \
 read -rsp "Token for that repo: " GH; echo; \
 read -rp "Shard index (0/1/2): " IDX; \
 [ -n "$GH" ] && [ -n "$REPO" ] && \
-export NS_REPO="$REPO" \
-       NS_GIT_TOKEN="$GH" \
-       NS_SHARD_INDEX="$IDX" \
-       NS_SHARD_TOTAL=3 \
-       NS_NODE_NAME="$(hostname)" \
-       NS_NONINTERACTIVE=1 && \
-curl -fsSL \
-     https://raw.githubusercontent.com/ScryerNet/Scryer-deployer/main/install.sh \
+export NS_REPO="$REPO" NS_GIT_TOKEN="$GH" NS_SHARD_INDEX="$IDX" \
+       NS_SHARD_TOTAL=3 NS_NODE_NAME="$(hostname)" NS_NONINTERACTIVE=1 \
+       NS_INSTALL_REPO="https://github.com/ScryerNet/Scryer-deployer.git" && \
+curl -fsSL https://raw.githubusercontent.com/ScryerNet/Scryer-deployer/main/install.sh \
   | sudo -E bash; \
-unset GH REPO IDX NS_REPO NS_GIT_TOKEN NS_SHARD_INDEX NS_SHARD_TOTAL NS_NODE_NAME NS_NONINTERACTIVE
+unset GH REPO IDX NS_REPO NS_GIT_TOKEN NS_SHARD_INDEX NS_SHARD_TOTAL NS_NODE_NAME NS_NONINTERACTIVE NS_INSTALL_REPO
 ```
 
 Run this on each Debian VM (replace `<you>` / repo names):
